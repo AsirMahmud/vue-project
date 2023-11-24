@@ -1,0 +1,63 @@
+[
+  {
+    "students": [
+      {
+        "roll": 101,
+        "student_id": "S001",
+        "name": "John Doe",
+        "academic_details": {
+          "grade": "A",
+          "marks": {
+            "math": 90,
+            "science": 85,
+            "english": 92
+          }
+        },
+        "guardian_details": {
+          "father_name": "James Doe",
+          "mother_name": "Jane Doe",
+          "relationship": "Parent",
+          "contact": "123-456-7890"
+        }
+      },
+      {
+        "roll": 102,
+        "student_id": "S002",
+        "name": "Alice Smith",
+        "academic_details": {
+          "grade": "B",
+          "marks": {
+            "math": 78,
+            "science": 80,
+            "english": 85
+          }
+        },
+        "guardian_details": {
+          "father_name": "Bob Smith",
+          "mother_name": "Betty Smith",
+          "relationship": "Parent",
+          "contact": "987-654-3210"
+        }
+      },
+      {
+        "roll": 103,
+        "student_id": "S003",
+        "name": "David Johnson",
+        "academic_details": {
+          "grade": "A-",
+          "marks": {
+            "math": 88,
+            "science": 92,
+            "english": 89
+          }
+        },
+        "guardian_details": {
+          "father_name": "Michael Johnson",
+          "mother_name": "Sarah Johnson",
+          "relationship": "Guardian",
+          "contact": "555-123-4567"
+        }
+      }
+    ]
+  }
+]
