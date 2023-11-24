@@ -71,7 +71,7 @@ watch(filters, () => {
         </span>
       </div>
     </template>
-    <Column field="id" header="ID" style="min-width: 12rem">
+    <Column field="id" header="ID">
       <template #body="{ data }">
         {{ data.id }}
       </template>
@@ -95,11 +95,24 @@ watch(filters, () => {
       header="Rating"
       :filter-match-mode="FilterMatchMode.CONTAINS"
     ></Column>
-    <Column
-      field="category"
-      header="category"
-      :filter-match-mode="FilterMatchMode.CONTAINS"
-    ></Column>
+    <template #filter="{ filterModel, filterCallback }">
+      <MultiSelect
+        v-model="filterModel.value"
+        @change="filterCallback()"
+        :options="representatives"
+        optionLabel="name"
+        placeholder="Any"
+        class="p-column-filter"
+        style="min-width: 14rem"
+        :maxSelectedLabels="1"
+      >
+        <template #option="slotProps">
+          <div class="flex align-items-center gap-2">
+            <span>{{ slotProps.option.name }}</span>
+          </div>
+        </template>
+      </MultiSelect>
+    </template>
     <Column
       field="price"
       header="Price"
@@ -110,13 +123,13 @@ watch(filters, () => {
       <div>
         <Button @click="pageDataDecreaser()">Prev</Button>
         <Button @click="pageDataIncreaser()">Next</Button>
-        <div style="text-align: left">
-          <Button
-            icon="pi pi-external-link"
-            label="Export"
-            @click="exportCSV($event)"
-          />
-        </div>
+      </div>
+      <div style="text-align: end">
+        <Button
+          icon="pi pi-external-link"
+          label="Export"
+          @click="exportCSV($event)"
+        />
       </div>
     </template>
   </DataTable>
