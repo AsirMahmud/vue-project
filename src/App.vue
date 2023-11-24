@@ -17,6 +17,9 @@ const exportCSV = () => {
 const filters = ref({
   global: { value: null, matchMode: FilterMatchMode.CONTAINS },
   id: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+  title: { value: null, matchMode: FilterMatchMode.CONTAINS },
+  rating: { value: null, matchMode: FilterMatchMode.CONTAINS },
+  price: { value: null, matchMode: FilterMatchMode.CONTAINS },
 });
 const pageData = ref(0);
 const pageDataIncreaser = () => {
@@ -70,18 +73,13 @@ watch(filters, () => {
         </span>
       </div>
     </template>
-    <Column field="id" header="ID">
+    <Column
+      field="id"
+      header="ID"
+      :filter-match-mode="FilterMatchMode.STARTS_WITH"
+    >
       <template #body="{ data }">
         {{ data.id }}
-      </template>
-      <template #filter>
-        <InputText
-          v-model="filterModel.value"
-          type="text"
-          @input="filterCallback()"
-          class="p-column-filter"
-          placeholder="Search by id"
-        />
       </template>
     </Column>
     <Column
@@ -94,24 +92,6 @@ watch(filters, () => {
       header="Rating"
       :filter-match-mode="FilterMatchMode.CONTAINS"
     ></Column>
-    <template #filter="{ filterModel, filterCallback }">
-      <MultiSelect
-        v-model="filterModel.value"
-        @change="filterCallback()"
-        :options="representatives"
-        optionLabel="name"
-        placeholder="Any"
-        class="p-column-filter"
-        style="min-width: 14rem"
-        :maxSelectedLabels="1"
-      >
-        <template #option="slotProps">
-          <div class="flex align-items-center gap-2">
-            <span>{{ slotProps.option.name }}</span>
-          </div>
-        </template>
-      </MultiSelect>
-    </template>
     <Column
       field="price"
       header="Price"
