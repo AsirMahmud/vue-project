@@ -8,7 +8,7 @@ import Column from "primevue/column";
 import Button from "primevue/button";
 
 // Fetching data
-const data = ref([]);
+const data1 = ref([]);
 const dtf = ref();
 const exportCSV = () => {
   dtf.value.exportCSV();
@@ -36,8 +36,7 @@ const fetchData = async () => {
       }&select=title,price,rating,category,brand&search?q=${""}`
     );
 
-    data.value = response.data.products;
-    console.log(data.value);
+    data1.value = response.data.products;
   } catch (error) {
     console.error("Error fetching data:", error);
   }
@@ -56,7 +55,7 @@ watch(filters, () => {
     ref="dtf"
     scrollable
     paginator-template="FirstPage"
-    :value="data"
+    :value="data1"
     :global-filter-fields="['id', 'title', 'price', 'rating', 'category']"
     :filters="filters"
   >
@@ -75,7 +74,7 @@ watch(filters, () => {
       <template #body="{ data }">
         {{ data.id }}
       </template>
-      <template #filter="{ filterModel, filterCallback }">
+      <template #filter>
         <InputText
           v-model="filterModel.value"
           type="text"
@@ -120,7 +119,7 @@ watch(filters, () => {
     ></Column>
 
     <template #footer>
-      <div>
+      <div style="text-align: center">
         <Button @click="pageDataDecreaser()">Prev</Button>
         <Button @click="pageDataIncreaser()">Next</Button>
       </div>
