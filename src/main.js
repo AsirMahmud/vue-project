@@ -105,4 +105,4 @@ import VirtualScroller from "primevue/virtualscroller";
 import App from "./App.vue";
 
 createApp(App).mount("#app");
-App.use(PrimeVue);
+app.use(PrimeVue);

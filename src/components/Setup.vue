@@ -7,8 +7,9 @@ import userData from "./assets/student_info.json";
 import { onMounted, ref } from "vue";
 import Button from "primevue/button";
 import jsPDF from "jspdf";
+
 const data = ref([]);
-const dtf = ref("");
+const dtf = ref(null);
 const filters = ref({
   global: {
     value: "",
@@ -22,7 +23,9 @@ onMounted(() => {
 });
 
 const exportCSV = () => {
-  dtf.value.exportCSV();
+  if (dtf.value) {
+    dtf.value.exportCSV();
+  }
 };
 
 const exportPDF = () => {
@@ -46,7 +49,23 @@ const exportPDF = () => {
     Grade: item.academic_details.grade,
   }));
 
-  doc.autoTable(columns, dataToPrint, { styles: { fontSize: 10 }, startY: 20 });
+  // Apply dataToPrint to the body of autoTable
+  doc.autoTable({
+    columns: columns,
+    body: [columns.map((column) => column)],
+    styles: { fontSize: 10 },
+    startY: 20,
+  });
+
+  // Add rows from dataToPrint to the body
+  dataToPrint.forEach((item) => {
+    const rowData = columns.map((column) => item[column]);
+    doc.autoTable({
+      body: [rowData],
+      styles: { fontSize: 10 },
+    });
+  });
+
   doc.save("exported_data.pdf");
 };
 </script>

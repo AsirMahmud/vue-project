@@ -6,6 +6,7 @@ import { FilterMatchMode } from "primevue/api";
 import InputText from "primevue/inputtext";
 import Column from "primevue/column";
 import Button from "primevue/button";
+import jsPDF from "jspdf";
 
 // Fetching data
 const data1 = ref([]);
@@ -13,6 +14,7 @@ const dtf = ref();
 const exportCSV = () => {
   dtf.value.exportCSV();
 };
+console.log(dtf);
 
 const filters = ref({
   global: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -51,6 +53,35 @@ onMounted(fetchData);
 watch(filters, () => {
   fetchData();
 });
+
+const exportPDF = () => {
+  const doc = new jsPDF();
+  const columns = ["Id", "Title", "Rating", "Price"];
+  const dataToPrint = data1.value.map((item) => ({
+    Id: item.id,
+    Title: item.title,
+    Rating: item.rating,
+    Price: item.price,
+  }));
+
+  // Apply dataToPrint to the body of autoTable
+  doc.autoTable({
+    columns: columns,
+    body: [columns.map((column) => column)],
+    styles: { fontSize: 10 },
+  });
+
+  // Add rows from dataToPrint to the body
+  dataToPrint.forEach((item) => {
+    const rowData = columns.map((column) => item[column]);
+    doc.autoTable({
+      body: [rowData],
+      styles: { fontSize: 10 },
+    });
+  });
+
+  doc.save("exported_data.pdf");
+};
 </script>
 
 <template>
@@ -103,10 +134,12 @@ watch(filters, () => {
         <Button @click="pageDataDecreaser()">Prev</Button>
         <Button @click="pageDataIncreaser()">Next</Button>
       </div>
-      <div style="text-align: end">
+      <div>
+        <Button icon="pi pi-download" @click="exportPDF">Pdf</Button>
         <Button
+          style="text-align: end"
           icon="pi pi-external-link"
-          label="Export"
+          label="Export Csv"
           @click="exportCSV($event)"
         />
       </div>

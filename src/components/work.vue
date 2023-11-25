@@ -8,11 +8,19 @@ import Column from "primevue/column";
 import Button from "primevue/button";
 
 // Fetching data
-const data = ref([]);
+const data1 = ref([]);
+const dtf = ref();
+const exportCSV = () => {
+  dtf.value.exportCSV();
+};
+console.log(dtf);
 
 const filters = ref({
   global: { value: null, matchMode: FilterMatchMode.CONTAINS },
   id: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+  title: { value: null, matchMode: FilterMatchMode.CONTAINS },
+  rating: { value: null, matchMode: FilterMatchMode.CONTAINS },
+  price: { value: null, matchMode: FilterMatchMode.CONTAINS },
 });
 const pageData = ref(0);
 const pageDataIncreaser = () => {
@@ -32,8 +40,7 @@ const fetchData = async () => {
       }&select=title,price,rating,category,brand&search?q=${""}`
     );
 
-    data.value = response.data.products;
-    console.log(data.value);
+    data1.value = response.data.products;
   } catch (error) {
     console.error("Error fetching data:", error);
   }
@@ -49,9 +56,10 @@ watch(filters, () => {
 
 <template>
   <DataTable
+    ref="dtf"
     scrollable
     paginator-template="FirstPage"
-    :value="data"
+    :value="data1"
     :global-filter-fields="['id', 'title', 'price', 'rating', 'category']"
     :filters="filters"
   >
@@ -66,18 +74,13 @@ watch(filters, () => {
         </span>
       </div>
     </template>
-    <Column field="id" header="ID" style="min-width: 12rem">
+    <Column
+      field="id"
+      header="ID"
+      :filter-match-mode="FilterMatchMode.STARTS_WITH"
+    >
       <template #body="{ data }">
         {{ data.id }}
-      </template>
-      <template #filter="{ filterModel, filterCallback }">
-        <InputText
-          v-model="filterModel.value"
-          type="text"
-          @input="filterCallback()"
-          class="p-column-filter"
-          placeholder="Search by id"
-        />
       </template>
     </Column>
     <Column
@@ -91,19 +94,23 @@ watch(filters, () => {
       :filter-match-mode="FilterMatchMode.CONTAINS"
     ></Column>
     <Column
-      field="category"
-      header="category"
-      :filter-match-mode="FilterMatchMode.CONTAINS"
-    ></Column>
-    <Column
       field="price"
       header="Price"
       :filter-match-mode="FilterMatchMode.CONTAINS"
     ></Column>
 
     <template #footer>
-      <Button :unstyled="disable" @click="pageDataDecreaser()">Prev</Button>
-      <Button :unstyled="disable" @click="pageDataIncreaser()">Next</Button>
+      <div style="text-align: center">
+        <Button @click="pageDataDecreaser()">Prev</Button>
+        <Button @click="pageDataIncreaser()">Next</Button>
+      </div>
+      <div style="text-align: end">
+        <Button
+          icon="pi pi-external-link"
+          label="Export"
+          @click="exportCSV($event)"
+        />
+      </div>
     </template>
   </DataTable>
 </template>
