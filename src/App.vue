@@ -24,6 +24,7 @@ const filters = ref({
   name: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
   title: { value: null, matchMode: FilterMatchMode.CONTAINS },
   rating: { value: null, matchMode: FilterMatchMode.CONTAINS },
+  category: { value: null, matchMode: FilterMatchMode.CONTAINS },
   price: { value: null, matchMode: FilterMatchMode.CONTAINS },
 });
 const pageData = ref(0);
@@ -72,18 +73,15 @@ const exportPDF = () => {
 
   // Apply dataToPrint to the body of autoTable
   doc.autoTable({
-    columns: columns,
-    body: [columns.map((column) => column)],
     styles: { fontSize: 10 },
   });
 
   // Add rows from dataToPrint to the body
-  dataToPrint.forEach((item) => {
-    const rowData = columns.map((column) => item[column]);
-    doc.autoTable({
-      body: [rowData],
-      styles: { fontSize: 10 },
-    });
+
+  doc.autoTable({
+    columns: columns,
+    body: dataToPrint.map((i) => columns.map((j) => i[j])),
+    styles: { fontSize: 10 },
   });
 
   doc.save("exported_data.pdf");
@@ -95,6 +93,7 @@ console.log(data1.value);
 <template>
   <DataTable
     ref="dtf"
+    v-model:filters="filters"
     filter-display="row"
     data-key="id"
     :loading="isLoading"
@@ -134,8 +133,26 @@ console.log(data1.value);
         />
       </template>
     </Column>
-    <Column field="category" header="Category"></Column>
-    <Column field="rating" header="Category"></Column>
+    <Column
+      field="category"
+      filter-field="category"
+      header="Product Name"
+      style="min-width: 12rem"
+    >
+      <template #body="{ data }">
+        {{ data.category }}
+      </template>
+      <template #filter="{ filterModel, filterCallback }">
+        <InputText
+          v-model="filterModel.value"
+          type="text"
+          @input="filterCallback()"
+          class="p-column-filter"
+          placeholder="Search by category"
+        />
+      </template>
+    </Column>
+    <Column field="rating" header="rating"></Column>
     <Column field="price" header="Price"></Column>
 
     <template #footer>
