@@ -8,9 +8,12 @@ import Column from "primevue/column";
 import Button from "primevue/button";
 import jsPDF from "jspdf";
 
+import Paginator from "primevue/paginator";
 // Fetching data
 const data1 = ref([]);
-const dtf = ref();
+const dtf = ref([]);
+const searchData = ref("");
+const isLoading = ref(false);
 const exportCSV = () => {
   dtf.value.exportCSV();
 };
@@ -18,7 +21,7 @@ console.log(dtf);
 
 const filters = ref({
   global: { value: null, matchMode: FilterMatchMode.CONTAINS },
-  id: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+  name: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
   title: { value: null, matchMode: FilterMatchMode.CONTAINS },
   rating: { value: null, matchMode: FilterMatchMode.CONTAINS },
   price: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -34,26 +37,29 @@ const pageDataDecreaser = () => {
 };
 
 const fetchData = async () => {
+  isLoading.value = true;
   try {
-    const response = await axios.get(
-      `https://dummyjson.com/products?limit=10&skip=${
-        pageData.value
-      }&select=title,price,rating,category,brand&search?q=${""}`
-    );
+    const response = await axios
+      .get(
+        `https://dummyjson.com/products?limit=10&skip=${pageData.value}&select=title,price,rating,category,brand&search?q=${searchData.value}`
+      )
+      .finally(() => {
+        isLoading.value = false;
+      });
 
     data1.value = response.data.products;
   } catch (error) {
     console.error("Error fetching data:", error);
   }
 };
-
+console.log(searchData.value);
 onMounted(fetchData);
 
 // Watch for changes to filters and refetch when they change
-watch(filters, () => {
+
+watch(searchData, () => {
   fetchData();
 });
-
 const exportPDF = () => {
   const doc = new jsPDF();
   const columns = ["Id", "Title", "Rating", "Price"];
@@ -82,13 +88,16 @@ const exportPDF = () => {
 
   doc.save("exported_data.pdf");
 };
+
+console.log(data1.value);
 </script>
 
 <template>
   <DataTable
     ref="dtf"
-    scrollable
-    paginator-template="FirstPage"
+    filter-display="row"
+    data-key="id"
+    :loading="isLoading"
     :value="data1"
     :global-filter-fields="['id', 'title', 'price', 'rating', 'category']"
     :filters="filters"
@@ -99,46 +108,53 @@ const exportPDF = () => {
           <i class="pi pi-search" />
           <InputText
             v-model="filters['global'].value"
-            placeholder="Keyword Search"
+            on-change=""
+            placeholder="Just table data  Search"
           />
         </span>
       </div>
     </template>
-    <Column
-      field="id"
-      header="ID"
-      :filter-match-mode="FilterMatchMode.STARTS_WITH"
-    >
-      <template #body="{ data }">
-        {{ data.id }}
-      </template>
-    </Column>
+    <Column field="id" header="ID"></Column>
     <Column
       field="title"
-      header="Title"
-      :filter-match-mode="FilterMatchMode.CONTAINS"
-    ></Column>
-    <Column
-      field="rating"
-      header="Rating"
-      :filter-match-mode="FilterMatchMode.CONTAINS"
-    ></Column>
-    <Column
-      field="price"
-      header="Price"
-      :filter-match-mode="FilterMatchMode.CONTAINS"
-    ></Column>
+      filter-field="title"
+      header="Product Name"
+      style="min-width: 12rem"
+    >
+      <template #body="{ data }">
+        {{ data.title }}
+      </template>
+      <template #filter="{ filterModel, filterCallback }">
+        <InputText
+          v-model="filterModel.value"
+          type="text"
+          @input="filterCallback()"
+          class="p-column-filter"
+          placeholder="Search by name"
+        />
+      </template>
+    </Column>
+    <Column field="category" header="Category"></Column>
+    <Column field="rating" header="Category"></Column>
+    <Column field="price" header="Price"></Column>
 
     <template #footer>
       <div style="text-align: center">
-        <Button @click="pageDataDecreaser()">Prev</Button>
+        <Button style="margin-right: 12px" @click="pageDataDecreaser()"
+          >Prev</Button
+        >
         <Button @click="pageDataIncreaser()">Next</Button>
       </div>
-      <div>
-        <Button icon="pi pi-download" @click="exportPDF">Pdf</Button>
+      <div style="margin: 10px">
         <Button
-          style="text-align: end"
-          icon="pi pi-external-link"
+          style="margin-left: 12px"
+          icon="pi pi-arrow-down"
+          label="Export PDF"
+          @click="exportPDF"
+        />
+        <Button
+          style="margin-left: 12px"
+          icon="pi pi-arrow-down"
           label="Export Csv"
           @click="exportCSV($event)"
         />

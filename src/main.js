@@ -104,5 +104,6 @@ import VirtualScroller from "primevue/virtualscroller";
 
 import App from "./App.vue";
 
-createApp(App).mount("#app");
+const app = createApp(App);
 app.use(PrimeVue);
+app.mount("#app");
